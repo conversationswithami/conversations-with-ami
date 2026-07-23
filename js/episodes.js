@@ -13,6 +13,8 @@
     listEl.innerHTML = `<p class="state-msg">${message}</p>`;
   }
 
+  let matchYouTube = function () { return null; };
+
   function render(episodes) {
     if (!episodes.length) {
       renderEmpty("No episodes found yet — check back soon.");
@@ -24,6 +26,13 @@
       .map(function (ep, i) {
         const num = ep.episode || total - i;
         const audio = ep.audioUrl || ep.link || "#";
+        const youtubeId = matchYouTube(ep);
+        const watchBtn = youtubeId
+          ? `<button type="button" class="episode-watch" data-yt="${youtubeId}" aria-expanded="false">Watch</button>`
+          : "";
+        const embedRow = youtubeId
+          ? `<div class="episode-embed" hidden></div>`
+          : "";
         return `
           <article class="episode">
             <div class="episode-num">${String(num).padStart(2, "0")}</div>
@@ -31,18 +40,50 @@
               <p class="episode-meta">${formatDate(ep.pubDate)}${ep.duration ? " · " + ep.duration : ""}</p>
               <h3>${ep.title || "Untitled episode"}</h3>
               <p class="episode-desc">${(ep.description || "").slice(0, 180)}${ep.description && ep.description.length > 180 ? "…" : ""}</p>
+              ${embedRow}
             </div>
-            <a class="episode-play" href="${audio}" target="_blank" rel="noopener" aria-label="Listen to ${ep.title || "this episode"}">▶</a>
+            <div class="episode-actions">
+              <a class="episode-play" href="${audio}" target="_blank" rel="noopener" aria-label="Listen to ${ep.title || "this episode"}">▶</a>
+              ${watchBtn}
+            </div>
           </article>`;
       })
       .join("");
+
+    listEl.querySelectorAll(".episode-watch").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        const embed = btn.closest(".episode").querySelector(".episode-embed");
+        const isOpen = !embed.hidden;
+        if (isOpen) {
+          embed.hidden = true;
+          embed.innerHTML = "";
+          btn.textContent = "Watch";
+          btn.setAttribute("aria-expanded", "false");
+        } else {
+          const videoId = btn.dataset.yt;
+          embed.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>`;
+          embed.hidden = false;
+          btn.textContent = "Hide video";
+          btn.setAttribute("aria-expanded", "true");
+        }
+      });
+    });
   }
 
   renderEmpty("Loading episodes…");
 
-  fetch("/api/episodes")
-    .then(function (res) { return res.json().then(function (data) { return { ok: res.ok, data: data }; }); })
-    .then(function (result) {
+  const episodesPromise = fetch("/api/episodes").then(function (res) {
+    return res.json().then(function (data) { return { ok: res.ok, data: data }; });
+  });
+  const youtubePromise = typeof fetchYouTubeVideos === "function" ? fetchYouTubeVideos() : Promise.resolve([]);
+
+  Promise.all([episodesPromise, youtubePromise])
+    .then(function (results) {
+      const result = results[0];
+      const videos = results[1];
+      if (typeof buildYouTubeMatcher === "function") {
+        matchYouTube = buildYouTubeMatcher(videos);
+      }
       if (!result.ok || result.data.error) {
         renderEmpty(
           "Episodes aren't connected yet. Once the RSS feed is set as the PODCAST_RSS_URL environment variable in Cloudflare Pages, they'll show up here automatically."

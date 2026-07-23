@@ -191,9 +191,26 @@ p { margin: 0 0 1.1em; max-width: 62ch; }
   flex: none;
 }
 .episode-play:hover { background: var(--blue); border-color: var(--blue); color: var(--paper); }
+.episode-actions {
+  display: flex; flex-direction: column; align-items: center; gap: 0.6rem;
+  flex: none;
+}
+.episode-watch {
+  font-family: var(--font-label);
+  font-weight: 700; font-size: 0.68rem; letter-spacing: 0.05em; text-transform: uppercase;
+  background: transparent; border: 1px solid var(--ink); color: var(--ink);
+  border-radius: var(--radius); padding: 0.35rem 0.6rem; cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+.episode-watch:hover { background: var(--blue); border-color: var(--blue); color: var(--paper); }
+.episode-embed { grid-column: 1 / -1; margin-top: 1rem; }
+.episode-embed iframe {
+  width: 100%; aspect-ratio: 16 / 9; border: 0; display: block;
+}
 @media (max-width: 600px) {
   .episode { grid-template-columns: auto 1fr; }
-  .episode-play { grid-column: 2; justify-self: start; margin-top: 0.5rem; }
+  .episode-actions { flex-direction: row; grid-column: 2; justify-self: start; margin-top: 0.5rem; }
 }
 
 .state-msg {
@@ -283,6 +300,18 @@ p { margin: 0 0 1.1em; max-width: 62ch; }
   text-decoration: none; color: var(--ink-soft);
 }
 .footer-links a:hover { color: var(--blue); }
+.footer-social {
+  display: flex; flex-wrap: wrap; gap: 1.5rem;
+  padding: 1.25rem 0; border-top: var(--border);
+  margin-bottom: 1.25rem;
+}
+.footer-social a {
+  font-family: var(--font-label); font-weight: 700; font-size: 0.72rem;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  text-decoration: none; color: var(--ink-soft);
+  transition: color 0.15s ease;
+}
+.footer-social a:hover { color: var(--blue); }
 .footer-bottom {
   font-family: var(--font-label); font-size: 0.72rem; letter-spacing: 0.04em;
   color: var(--ink-soft);
