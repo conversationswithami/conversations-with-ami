@@ -1,4 +1,4 @@
-[README.md](https://github.com/user-attachments/files/30322970/README.md)
+[README.md](https://github.com/user-attachments/files/30324105/README.md)
 # Conversations with Ami — website
 
 ## What is this?
@@ -104,6 +104,28 @@ Already has the real bio/copy in place — no action needed.
 
 ---
 
+## Podcast video: one setup step (YouTube API key)
+
+Episodes now get a "Watch" button that expands an embedded YouTube player,
+matched automatically to your channel (@ConversationswithAmi) by title —
+new episodes will match automatically too, as long as the YouTube title
+and RSS title are the same or similar (guest name matches). Here's the
+one-time setup:
+
+1. Go to https://console.cloud.google.com (this is a different Google
+   tool than YouTube Studio — Studio itself doesn't do this part).
+2. Create a project if you don't have one (top left, "Select a project" → "New Project").
+3. In the search bar, search **"YouTube Data API v3"** → open it → click **Enable**.
+4. Go to **APIs & Services → Credentials** → **Create Credentials** → **API key**.
+5. Copy the key. (Optional but recommended: click "Restrict key" and limit
+   it to the YouTube Data API v3 only, so it can't be used for anything else.)
+6. In Cloudflare Pages: your project → **Settings → Environment variables**
+   → add one named exactly `YOUTUBE_API_KEY`, value = the key you copied.
+   Add it for both **Production** and **Preview**, then redeploy.
+
+That's it — no changes needed here whenever you publish a new episode,
+as long as it's uploaded to the same YouTube channel.
+
 ## What's still needed from you
 - [ ] The Kit API key (5-minute setup above) — this is the only remaining piece
 - [ ] Sending your first Public-marked newsletter issue, whenever ready
@@ -122,5 +144,6 @@ js/nav.js                    Mobile menu behavior
 js/episodes.js               Renders episodes from the RSS feed
 functions/api/episodes.js    Server-side code that fetches your RSS feed
 functions/api/newsletter.js  Server-side code that fetches your public Kit issues
+functions/api/youtube.js     Server-side code that fetches your YouTube channel's videos
 assets/logos/                Your brand logo files
 ```
