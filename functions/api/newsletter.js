@@ -25,7 +25,7 @@ export async function onRequestGet(context) {
   }
 
   try {
-    const res = await fetch("https://api.kit.com/v4/posts?per_page=200", {
+    const res = await fetch("https://api.kit.com/v4/posts?per_page=200&include_content=true", {
       headers: { "X-Kit-Api-Key": apiKey },
       cf: { cacheTtl: 900, cacheEverything: true }, // cache 15 min at the edge
     });
@@ -59,6 +59,7 @@ export async function onRequestGet(context) {
       .map((p, i, arr) => ({
         subject: p.title,
         description: p.description || "",
+        content: p.content || "",
         publishedAt: p.published_at,
         url: p.public_url,
         thumbnail: p.thumbnail_url,

@@ -1,6 +1,9 @@
 (function () {
   const grid = document.getElementById("archive-grid");
+  const reader = document.getElementById("newsletter-reader");
   if (!grid) return;
+
+  let issuesData = [];
 
   function formatDate(iso) {
     if (!iso) return "";
@@ -13,6 +16,37 @@
     grid.innerHTML = `<p class="state-msg">${message}</p>`;
   }
 
+  function closeReader() {
+    if (!reader) return;
+    reader.hidden = true;
+    reader.innerHTML = "";
+    grid.querySelectorAll(".archive-card").forEach(function (c) {
+      c.setAttribute("aria-expanded", "false");
+    });
+  }
+
+  function openReader(index) {
+    if (!reader) return;
+    const issue = issuesData[index];
+    if (!issue) return;
+
+    reader.innerHTML = `
+      <button type="button" class="reader-close" aria-label="Close">✕ Close</button>
+      <p class="issue-date">${formatDate(issue.publishedAt)}</p>
+      <h2>${issue.subject || "Untitled issue"}</h2>
+      <div class="reader-body">${issue.content || "<p>This issue doesn't have readable content yet.</p>"}</div>
+      <p><a href="${issue.url}" target="_blank" rel="noopener">Open this issue on Kit ↗</a></p>
+    `;
+    reader.hidden = false;
+
+    grid.querySelectorAll(".archive-card").forEach(function (c, i) {
+      c.setAttribute("aria-expanded", String(i === index));
+    });
+
+    reader.querySelector(".reader-close").addEventListener("click", closeReader);
+    reader.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
   function render(issues) {
     if (!issues.length) {
       renderMessage(
@@ -20,16 +54,28 @@
       );
       return;
     }
+    issuesData = issues;
     grid.innerHTML = issues
-      .map(function (issue) {
+      .map(function (issue, i) {
         return `
-          <a class="archive-card" href="${issue.url}" target="_blank" rel="noopener">
+          <button type="button" class="archive-card" data-index="${i}" aria-expanded="false">
             <span class="issue-num">Issue ${String(issue.issueNumber).padStart(2, "0")}</span>
             <h3>${issue.subject || "Untitled issue"}</h3>
             <span class="issue-date">${formatDate(issue.publishedAt)}</span>
-          </a>`;
+          </button>`;
       })
       .join("");
+
+    grid.querySelectorAll(".archive-card").forEach(function (card) {
+      card.addEventListener("click", function () {
+        const isOpen = card.getAttribute("aria-expanded") === "true";
+        if (isOpen) {
+          closeReader();
+        } else {
+          openReader(Number(card.dataset.index));
+        }
+      });
+    });
   }
 
   renderMessage("Loading past issues…");

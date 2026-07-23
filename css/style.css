@@ -231,9 +231,12 @@ p { margin: 0 0 1.1em; max-width: 62ch; }
   padding: 1.75rem;
   display: flex; flex-direction: column; gap: 0.6rem;
   text-decoration: none; color: var(--ink);
+  background: transparent; font: inherit; text-align: left; cursor: pointer;
+  width: 100%;
   transition: border-color 0.15s ease, transform 0.15s ease;
 }
-.archive-card:hover { border-color: var(--blue); transform: translateY(-2px); }
+.archive-card:hover,
+.archive-card[aria-expanded="true"] { border-color: var(--blue); transform: translateY(-2px); }
 .archive-card .issue-num {
   font-family: var(--font-label); font-weight: 700;
   font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
@@ -244,6 +247,27 @@ p { margin: 0 0 1.1em; max-width: 62ch; }
   font-family: var(--font-label); font-size: 0.72rem;
   color: var(--ink-soft); margin-top: auto;
 }
+
+.newsletter-reader {
+  margin-top: 2.5rem;
+  padding-top: 2.5rem;
+  border-top: var(--border);
+}
+.newsletter-reader .issue-date {
+  font-family: var(--font-label); font-size: 0.72rem;
+  letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-soft);
+}
+.reader-close {
+  font-family: var(--font-label); font-weight: 700; font-size: 0.72rem;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  background: transparent; border: 1px solid var(--ink); color: var(--ink);
+  border-radius: var(--radius); padding: 0.5rem 0.9rem; cursor: pointer;
+  float: right;
+  transition: all 0.15s ease;
+}
+.reader-close:hover { background: var(--ink); color: var(--paper); }
+.reader-body { margin-top: 1.5rem; clear: both; }
+.reader-body img { border-radius: var(--radius); margin: 1rem 0; }
 
 /* ============ Newsletter signup block ============ */
 .signup-block {
