@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Podcast — Conversations with Ami</title>
+<meta name="description" content="Listen to every episode of Conversations with Ami.">
+<link rel="icon" href="assets/logos/Logo_blue.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-nav">
+  <a class="brand" href="index.html" aria-label="Conversations with Ami — home">
+    <img src="assets/logos/Logo_blue.svg" alt="Conversations with Ami">
+  </a>
+  <button class="nav-toggle" aria-expanded="false" aria-controls="primary-nav" aria-label="Toggle menu">☰</button>
+  <ul class="nav-links" id="primary-nav">
+    <li class="nav-item"><a href="index.html">About</a></li>
+    <li class="nav-item"><a href="podcast.html" aria-current="page">The Podcast</a></li>
+    <li class="nav-item"><a href="newsletter.html">Newsletter</a></li>
+    <li><a class="nav-cta" href="#signup">Join the newsletter</a></li>
+  </ul>
+</header>
+
+<main id="main">
+
+  <section class="wrap section-tight">
+    <p class="eyebrow">The Podcast</p>
+    <h1>Every episode, in one place.</h1>
+    <p class="lede">Streaming straight from the show's RSS feed — new episodes appear here as soon as they're published. Also available wherever you already listen.</p>
+  </section>
+
+  <section class="wrap">
+    <div id="episode-list" class="episode-list" aria-live="polite">
+      <p class="state-msg">Loading episodes…</p>
+    </div>
+  </section>
+
+  <section class="wrap" id="signup">
+    <div class="signup-block">
+      <div>
+        <p class="eyebrow">Still Building with Ami</p>
+        <h2>Don't miss the next one</h2>
+        <p class="lede">Get a heads-up when new episodes drop, plus the extra stuff that doesn't make it into the show — in the newsletter.</p>
+      </div>
+      <div class="signup-form-slot"></div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer wrap">
+  <div class="footer-top">
+    <div class="footer-logos">
+      <img src="assets/logos/Logo_black.svg" alt="Conversations with Ami">
+    </div>
+    <nav class="footer-links">
+      <ul>
+        <li><a href="index.html">About</a></li>
+        <li><a href="podcast.html">The Podcast</a></li>
+        <li><a href="newsletter.html">Newsletter Archive</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="footer-bottom">
+    <span>&copy; <span id="year"></span> Conversations with Ami</span>
+    <span>Built with care.</span>
+  </div>
+</footer>
+
+<script src="js/config.js"></script>
+<script src="js/nav.js"></script>
+<script src="js/newsletter-embed.js"></script>
+<script src="js/episodes.js"></script>
+<script>document.getElementById("year").textContent = new Date().getFullYear();</script>
+</body>
+</html>
