@@ -35,6 +35,24 @@ export async function onRequestGet(context) {
     }
 
     const data = await res.json();
+
+    const debugMode = new URL(context.request.url).searchParams.get("debug");
+    if (debugMode) {
+      return jsonResponse(
+        {
+          debug: true,
+          totalPostsReturned: (data.posts || []).length,
+          posts: (data.posts || []).map((p) => ({
+            title: p.title,
+            status: p.status,
+            public_url: p.public_url,
+            published_at: p.published_at,
+          })),
+        },
+        200
+      );
+    }
+
     const issues = (data.posts || [])
       .filter((p) => p.status === "published" && p.public_url)
       .sort((a, b) => new Date(b.published_at) - new Date(a.published_at))
