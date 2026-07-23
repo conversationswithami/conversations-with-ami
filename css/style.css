@@ -186,7 +186,8 @@ p { margin: 0 0 1.1em; max-width: 62ch; }
   display: inline-flex; align-items: center; justify-content: center;
   width: 46px; height: 46px; border-radius: 50%;
   border: 2px solid var(--ink);
-  text-decoration: none; color: var(--ink);
+  background: transparent; color: var(--ink);
+  font: inherit; font-size: 1rem; cursor: pointer;
   transition: all 0.15s ease;
   flex: none;
 }

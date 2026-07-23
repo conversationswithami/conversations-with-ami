@@ -25,14 +25,16 @@
     listEl.innerHTML = episodes
       .map(function (ep, i) {
         const num = ep.episode || total - i;
-        const audio = ep.audioUrl || ep.link || "#";
+        const audio = ep.audioUrl || ep.link || "";
         const youtubeId = matchYouTube(ep);
         const watchBtn = youtubeId
           ? `<button type="button" class="episode-watch" data-yt="${youtubeId}" aria-expanded="false">Watch</button>`
           : "";
-        const embedRow = youtubeId
-          ? `<div class="episode-embed" hidden></div>`
+        const playBtn = audio
+          ? `<button type="button" class="episode-play" data-audio="${audio}" aria-expanded="false" aria-label="Listen to ${ep.title || "this episode"}">▶</button>`
           : "";
+        const hasEmbedRow = youtubeId || audio;
+        const embedRow = hasEmbedRow ? `<div class="episode-embed" hidden></div>` : "";
         return `
           <article class="episode">
             <div class="episode-num">${String(num).padStart(2, "0")}</div>
@@ -43,17 +45,43 @@
               ${embedRow}
             </div>
             <div class="episode-actions">
-              <a class="episode-play" href="${audio}" target="_blank" rel="noopener" aria-label="Listen to ${ep.title || "this episode"}">▶</a>
+              ${playBtn}
               ${watchBtn}
             </div>
           </article>`;
       })
       .join("");
 
+    listEl.querySelectorAll(".episode-play").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        const embed = btn.closest(".episode").querySelector(".episode-embed");
+        const otherBtn = btn.closest(".episode").querySelector(".episode-watch");
+        const isOpen = !embed.hidden && embed.dataset.kind === "audio";
+        if (isOpen) {
+          embed.hidden = true;
+          embed.innerHTML = "";
+          btn.textContent = "▶";
+          btn.setAttribute("aria-expanded", "false");
+        } else {
+          const audioUrl = btn.dataset.audio;
+          embed.innerHTML = `<audio controls autoplay src="${audioUrl}" style="width:100%;"></audio>`;
+          embed.dataset.kind = "audio";
+          embed.hidden = false;
+          btn.textContent = "◼";
+          btn.setAttribute("aria-expanded", "true");
+          if (otherBtn) {
+            otherBtn.textContent = "Watch";
+            otherBtn.setAttribute("aria-expanded", "false");
+          }
+        }
+      });
+    });
+
     listEl.querySelectorAll(".episode-watch").forEach(function (btn) {
       btn.addEventListener("click", function () {
         const embed = btn.closest(".episode").querySelector(".episode-embed");
-        const isOpen = !embed.hidden;
+        const otherBtn = btn.closest(".episode").querySelector(".episode-play");
+        const isOpen = !embed.hidden && embed.dataset.kind === "video";
         if (isOpen) {
           embed.hidden = true;
           embed.innerHTML = "";
@@ -62,9 +90,14 @@
         } else {
           const videoId = btn.dataset.yt;
           embed.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>`;
+          embed.dataset.kind = "video";
           embed.hidden = false;
           btn.textContent = "Hide video";
           btn.setAttribute("aria-expanded", "true");
+          if (otherBtn) {
+            otherBtn.textContent = "▶";
+            otherBtn.setAttribute("aria-expanded", "false");
+          }
         }
       });
     });
