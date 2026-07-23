@@ -1,7 +1,9 @@
 // Cloudflare Pages Function — served at /api/newsletter
 //
-// Pulls your sent newsletter issues from Kit's API and returns only the
-// ones you've marked "Public" (those are the only ones with a public_url).
+// Pulls your published newsletter issues from Kit's Posts API. When you
+// mark a broadcast "Public" in Kit, it publishes a matching Post — that's
+// the resource with the actual public_url, which is why this calls
+// /v4/posts rather than /v4/broadcasts.
 //
 // SET THIS UP IN CLOUDFLARE:
 //   Pages project > Settings > Environment variables
@@ -23,7 +25,7 @@ export async function onRequestGet(context) {
   }
 
   try {
-    const res = await fetch("https://api.kit.com/v4/broadcasts?status=completed&per_page=200", {
+    const res = await fetch("https://api.kit.com/v4/posts?per_page=200", {
       headers: { "X-Kit-Api-Key": apiKey },
       cf: { cacheTtl: 900, cacheEverything: true }, // cache 15 min at the edge
     });
@@ -33,21 +35,39 @@ export async function onRequestGet(context) {
     }
 
     const data = await res.json();
-    const issues = (data.broadcasts || [])
-      .filter((b) => b.public && b.public_url)
+
+    const debugMode = new URL(context.request.url).searchParams.get("debug");
+    if (debugMode) {
+      return jsonResponse(
+        {
+          debug: true,
+          totalPostsReturned: (data.posts || []).length,
+          posts: (data.posts || []).map((p) => ({
+            title: p.title,
+            status: p.status,
+            public_url: p.public_url,
+            published_at: p.published_at,
+          })),
+        },
+        200
+      );
+    }
+
+    const issues = (data.posts || [])
+      .filter((p) => p.status === "published" && p.public_url)
       .sort((a, b) => new Date(b.published_at) - new Date(a.published_at))
-      .map((b, i, arr) => ({
-        subject: b.subject,
-        description: b.description || b.preview_text || "",
-        publishedAt: b.published_at,
-        url: b.public_url,
-        thumbnail: b.thumbnail_url,
+      .map((p, i, arr) => ({
+        subject: p.title,
+        description: p.description || "",
+        publishedAt: p.published_at,
+        url: p.public_url,
+        thumbnail: p.thumbnail_url,
         issueNumber: arr.length - i,
       }));
 
     return jsonResponse({ issues }, 200, 900);
   } catch (err) {
-    return jsonResponse({ error: "Could not fetch or parse Kit broadcasts.", detail: String(err) }, 502);
+    return jsonResponse({ error: "Could not fetch or parse Kit posts.", detail: String(err) }, 502);
   }
 }
 
